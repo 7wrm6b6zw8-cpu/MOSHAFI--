@@ -1,5 +1,5 @@
 // عند كل نشر جديد: غيّر رقم VERSION ليتجدد الكاش (والـ shell يتحدّث تلقائيًا أيضًا بنمط stale-while-revalidate)
-const VERSION = 'v4-flat';
+const VERSION = 'v5';
 const APP_SHELL_CACHE = `moshafi-shell-${VERSION}`;
 const RUNTIME_CACHE = `moshafi-runtime-${VERSION}`;
 const AUDIO_CACHE = 'moshafi-audio-v1'; // يديره التطبيق (التنزيلات) ولا يُحذف هنا
@@ -46,6 +46,18 @@ async function staleWhileRevalidate(request, cacheName, { trim = 0 } = {}) {
   return cached || network;
 }
 
+// ملفات التطبيق: الإنترنت أولًا (فتظهر التحديثات فورًا)، والمخزَّن عند انقطاع الاتصال
+async function networkFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  try {
+    const res = await fetch(request);
+    if (res && res.ok) cache.put(request, res.clone());
+    return res;
+  } catch {
+    return (await cache.match(request)) || Response.error();
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -55,11 +67,11 @@ self.addEventListener('fetch', (event) => {
     // التنقل بدون إنترنت يرجع إلى index.html
     if (request.mode === 'navigate') {
       event.respondWith(
-        staleWhileRevalidate(request, APP_SHELL_CACHE).then((r) => r || caches.match('./index.html'))
+        networkFirst(request, APP_SHELL_CACHE).then((r) => r || caches.match('./index.html'))
       );
       return;
     }
-    event.respondWith(staleWhileRevalidate(request, APP_SHELL_CACHE));
+    event.respondWith(networkFirst(request, APP_SHELL_CACHE));
     return;
   }
 

@@ -78,10 +78,10 @@ class MoshafiApp {
     const updateBadge = () => {
       const badge = document.getElementById('connection-badge');
       if (navigator.onLine) {
-        badge.textContent = 'متصل بالشبكة';
+        badge.textContent = 'متصل';
         badge.className = 'badge badge-online';
       } else {
-        badge.textContent = 'وضع بدون إنترنت';
+        badge.textContent = 'بدون إنترنت';
         badge.className = 'badge badge-offline';
       }
     };
@@ -143,8 +143,6 @@ class MoshafiApp {
     document.documentElement.style.setProperty('--ui-font-size', `${s.uiFontSize}px`);
     document.body.classList.toggle('simple-mode', Boolean(s.simpleMode));
 
-    document.getElementById('btn-simple-mode').querySelector('span').textContent =
-      `الوضع المبسط: ${s.simpleMode ? 'مفعّل' : 'إيقاف'}`;
     document.getElementById('btn-theme-toggle').querySelector('span').textContent =
       s.theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي';
 
@@ -198,7 +196,8 @@ class MoshafiApp {
     if (push && cur !== viewName) history.pushState({ view: viewName }, '');
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.view === viewName);
+      const inMore = ['downloads', 'bookmarks', 'settings'].includes(viewName);
+      btn.classList.toggle('active', btn.dataset.view === (inMore ? 'more' : viewName));
     });
     const target = document.getElementById(`view-${viewName}`);
     if (target) target.classList.add('active');
@@ -209,13 +208,6 @@ class MoshafiApp {
   }
 
   renderHomeSurahs(filterText = '') {
-    const quickIds = [1, 2, 18, 36, 55, 67, 112];
-    const quickContainer = document.getElementById('home-quick-surahs');
-    quickContainer.innerHTML = quickIds.map(id => {
-      const ch = this.chapters.find(c => c.id === id);
-      if (!ch) return '';
-      return `<button class="btn btn-secondary btn-sm" data-open-surah="${ch.id}" type="button"><span>سورة ${ch.name_arabic}</span></button>`;
-    }).join('');
 
     const listEl = document.getElementById('home-surah-list');
     const q = normalizeArabic(filterText);
@@ -311,10 +303,6 @@ class MoshafiApp {
     const usage = await this.storage.estimateStorageUsage();
     document.getElementById('storage-usage-text').textContent =
       `المساحة المستخدمة: ${usage.usedMB} ميجابايت (السور المحفوظة: ${packages.length})`;
-    document.getElementById('home-offline-status').textContent =
-      packages.length > 0
-        ? `لديك ${packages.length} سورة جاهزة للعمل الكامل بدون إنترنت (المساحة: ${usage.usedMB} MB).`
-        : 'لا توجد سور منزّلة حاليًا. نزّل سورك المفضلة لقراءتها والاستماع إليها بدون إنترنت.';
 
     this.downloadedSurahIds = new Set(packages.filter(p => p.reciterId === (this.storage.getSettings().reciterId || 7)).map(p => p.surahId));
     const dlList = document.getElementById('downloaded-surahs-list');
@@ -505,7 +493,7 @@ class MoshafiApp {
     document.addEventListener('visibilitychange', () => this.updateWakeLock());
 
     // الورد اليومي والختمة
-    const grid = document.querySelector('#view-home .dashboard-grid');
+    const grid = document.querySelector('#view-more .dashboard-grid');
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -707,12 +695,6 @@ class MoshafiApp {
     document.getElementById('btn-theme-toggle').addEventListener('click', () => {
       const next = this.storage.getSettings().theme === 'dark' ? 'light' : 'dark';
       this.storage.saveSettings({ theme: next });
-      this.applySettingsToUI();
-    });
-
-    document.getElementById('btn-simple-mode').addEventListener('click', () => {
-      const next = !this.storage.getSettings().simpleMode;
-      this.storage.saveSettings({ simpleMode: next });
       this.applySettingsToUI();
     });
 

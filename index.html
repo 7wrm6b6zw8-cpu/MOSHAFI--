@@ -28,54 +28,35 @@
   <header class="app-header">
     <div class="brand">
       <img src="./icon-192.png" alt="شعار مصحفي" class="brand-logo" />
-      <div class="brand-titles">
-        <h1>مصحفي <span class="brand-en">| MOSHAFI</span></h1>
-        <span id="connection-badge" class="badge badge-online">متصل بالشبكة</span>
-      </div>
+      <h1>مصحفي</h1>
+      <span id="connection-badge" class="badge badge-online" title="حالة الاتصال">متصل</span>
     </div>
-
     <div class="header-actions">
-      <button id="btn-simple-mode" class="btn btn-outline" type="button" title="تبديل الوضع المبسط لكبار السن">
-        <span>الوضع المبسط: إيقاف</span>
-      </button>
-      <button id="btn-theme-toggle" class="btn btn-outline" type="button">
-        <span>الوضع الليلي</span>
-      </button>
-      <button id="btn-install-pwa" class="btn btn-gold hidden" type="button">
-        <span>تثبيت التطبيق</span>
-      </button>
+      <button id="btn-theme-toggle" class="btn btn-outline btn-sm" type="button" title="تبديل الوضع الليلي"><span>الوضع الليلي</span></button>
+      <button id="btn-install-pwa" class="btn btn-gold btn-sm hidden" type="button"><span>تثبيت</span></button>
     </div>
   </header>
 
-  <!-- القائمة الرئيسية للتنقل (7 أقسام واضحة بالاسم والأيقونة) -->
   <nav class="main-nav" aria-label="التنقل الرئيسي">
     <button class="nav-item active" data-view="home" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
       <span>الرئيسية</span>
     </button>
     <button class="nav-item" data-view="mushaf" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2V4zm20 0h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8V4z"/></svg>
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2V4zm20 0h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8V4z"/></svg>
       <span>المصحف</span>
     </button>
     <button class="nav-item" data-view="listen" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
       <span>الاستماع</span>
     </button>
-    <button class="nav-item" data-view="downloads" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span>التنزيلات</span>
-    </button>
     <button class="nav-item" data-view="search" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <span>البحث</span>
     </button>
-    <button class="nav-item" data-view="bookmarks" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      <span>المفضلة</span>
-    </button>
-    <button class="nav-item" data-view="settings" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>الإعدادات</span>
+    <button class="nav-item" data-view="more" type="button">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+      <span>المزيد</span>
     </button>
   </nav>
 
@@ -85,36 +66,16 @@
     <section id="view-home" class="view active">
       <div class="hero-card">
         <div class="hero-ornament">﷽</div>
-        <h2>مرحبًا بك في مصحفي</h2>
-        <p class="subtitle">تجربة قرآنية هادئة تجمع بين دقة الرسم العثماني، والتلاوة المتزامنة كلمة بكلمة، والتفسير الموثق.</p>
         <div class="hero-actions">
-          <button id="btn-resume-reading" class="btn btn-primary" type="button">
-            <span>متابعة القراءة (صفحة 1)</span>
-          </button>
-          <button id="btn-resume-listening" class="btn btn-gold" type="button">
-            <span>متابعة الاستماع (سورة الفاتحة)</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="dashboard-grid">
-        <div class="card">
-          <h3>الوصول السريع للسور</h3>
-          <div class="quick-surahs" id="home-quick-surahs"></div>
-        </div>
-        <div class="card">
-          <h3>حالة التنزيلات والتخزين المحلي</h3>
-          <p id="home-offline-status">جارٍ فحص البيانات المخزنة محليًا...</p>
-          <button class="btn btn-outline" data-goto="downloads" type="button">
-            <span>إدارة التنزيلات والعمل بدون إنترنت</span>
-          </button>
+          <button id="btn-resume-reading" class="btn btn-primary" type="button"><span>متابعة القراءة (صفحة 1)</span></button>
+          <button id="btn-resume-listening" class="btn btn-gold" type="button"><span>متابعة الاستماع (سورة الفاتحة)</span></button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header-row">
-          <h3>فهرس سور القرآن الكريم (114 سورة)</h3>
-          <input type="search" id="home-surah-filter" class="input" placeholder="اكتب اسم السورة للانتقال السريع..." />
+          <h3>السور</h3>
+          <input type="search" id="home-surah-filter" class="input" placeholder="ابحث عن سورة" />
         </div>
         <div id="home-surah-list" class="surah-grid"></div>
       </div>
@@ -124,40 +85,26 @@
     <section id="view-mushaf" class="view">
       <div class="mushaf-toolbar">
         <div class="toolbar-group">
-          <label for="mushaf-surah-select">السورة:</label>
+          <label for="mushaf-surah-select" class="sr-only">السورة</label>
           <select id="mushaf-surah-select" class="select"></select>
-
           <label for="mushaf-juz-select" class="adv-opt">الجزء:</label>
           <select id="mushaf-juz-select" class="select adv-opt"></select>
-
-          <label for="mushaf-page-input">الصفحة:</label>
+          <label for="mushaf-page-input">صفحة</label>
           <input type="number" id="mushaf-page-input" class="input input-sm" min="1" max="604" value="1" />
-          <button id="btn-go-page" class="btn btn-secondary" type="button"><span>انتقال</span></button>
+          <button id="btn-go-page" class="btn btn-secondary btn-sm" type="button"><span>انتقال</span></button>
         </div>
 
-        <div class="toolbar-group">
-          <button id="btn-mode-page" class="btn btn-toggle active" type="button">
-            <span>صفحات المصحف</span>
-          </button>
-          <button id="btn-mode-verse" class="btn btn-toggle" type="button">
-            <span>عرض الآيات</span>
-          </button>
-        </div>
-
-        <div class="toolbar-group">
-          <button id="btn-font-dec" class="btn btn-outline" type="button" title="تصغير الخط">
-            <span>تصغير الخط -</span>
-          </button>
-          <button id="btn-font-inc" class="btn btn-outline" type="button" title="تكبير الخط">
-            <span>تكبير الخط +</span>
-          </button>
-          <button id="btn-bookmark-page" class="btn btn-gold" type="button">
-            <span>حفظ علامة للصفحة</span>
-          </button>
-          <button id="btn-download-current-surah" class="btn btn-primary" type="button">
-            <span>تنزيل</span>
-          </button>
-        </div>
+        <details class="toolbar-more">
+          <summary>خيارات العرض</summary>
+          <div class="toolbar-group">
+            <button id="btn-mode-page" class="btn btn-toggle active" type="button"><span>صفحات المصحف</span></button>
+            <button id="btn-mode-verse" class="btn btn-toggle" type="button"><span>عرض الآيات</span></button>
+            <button id="btn-font-dec" class="btn btn-outline" type="button" title="تصغير الخط"><span>الخط -</span></button>
+            <button id="btn-font-inc" class="btn btn-outline" type="button" title="تكبير الخط"><span>الخط +</span></button>
+            <button id="btn-bookmark-page" class="btn btn-gold" type="button"><span>حفظ علامة للصفحة</span></button>
+            <button id="btn-download-current-surah" class="btn btn-primary" type="button"><span>تنزيل السورة</span></button>
+          </div>
+        </details>
       </div>
 
       <div class="mushaf-workspace">
@@ -225,22 +172,25 @@
     <section id="view-listen" class="view">
       <div class="card">
         <div class="card-header-row">
-          <div>
-            <h2>الاستماع والتلاوة المتزامنة</h2>
-            <p class="subtitle">اختر القارئ والسورة لمتابعة التلاوة مع تظليل الكلمات والتفسير اللحظي.</p>
-          </div>
+          <h2>الاستماع</h2>
           <div class="reciter-selector-box">
             <label for="listen-reciter-select">القارئ:</label>
             <select id="listen-reciter-select" class="select"></select>
           </div>
         </div>
-
-        <div id="sync-availability-notice" class="notice-bar">
-          جارٍ التحقق من توفر توقيتات الكلمات الدقيقة (Word-level timestamps) لهذا القارئ...
-        </div>
-
+        <div id="sync-availability-notice" class="notice-bar hidden"></div>
         <div id="listen-surah-list" class="surah-grid"></div>
       </div>
+    </section>
+
+    <!-- قسم المزيد -->
+    <section id="view-more" class="view">
+      <div class="more-list">
+        <button class="more-item" data-goto="bookmarks" type="button"><span>المفضلة والعلامات</span><span class="more-arrow">‹</span></button>
+        <button class="more-item" data-goto="downloads" type="button"><span>التنزيلات (للعمل بدون إنترنت)</span><span class="more-arrow">‹</span></button>
+        <button class="more-item" data-goto="settings" type="button"><span>الإعدادات</span><span class="more-arrow">‹</span></button>
+      </div>
+      <div class="dashboard-grid" style="margin-top:14px;"></div>
     </section>
 
     <!-- 4. قسم التنزيلات -->
@@ -378,118 +328,118 @@
     </section>
   </main>
 
-  <!-- مشغل القرآن الصوتي المستمر ولوحة التفسير اللحظي وتزامن الكلمات -->
-  <div id="persistent-player" class="player-dock expanded" role="region" aria-label="مشغل القرآن الصوتي">
-    <!-- شريط التحكم في تصغير/تكبير المشغل -->
-    <div class="player-top-bar">
-      <div class="player-now-playing">
-        <strong id="player-surah-title">سورة الفاتحة</strong>
-        <span id="player-reciter-name">مشاري راشد العفاسي</span>
-        <span id="player-verse-badge" class="badge">الآية 1:1</span>
-        <span id="player-offline-indicator" class="badge hidden">تشغيل محلي بدون إنترنت</span>
-      </div>
-      <div class="player-top-actions">
-        <button id="btn-toggle-live-tafsir" class="btn btn-outline btn-sm" type="button">
-          <span>التفسير اللحظي</span>
-        </button>
-        <button id="btn-toggle-player-size" class="btn btn-outline btn-sm" type="button">
-          <span>تصغير المشغل</span>
-        </button>
-      </div>
-    </div>
+  <!-- مشغل القرآن: شريط مصغّر + نافذة كاملة تُفتح عند الضغط -->
+  <div id="persistent-player" class="player-dock" role="region" aria-label="مشغل القرآن الصوتي">
+    <div id="player-backdrop" class="player-backdrop"></div>
 
-    <!-- عرض الآية الحالية مع تظليل الكلمات المتزامن -->
-    <div id="player-word-sync-box" class="word-sync-container">
-      <div id="word-sync-text" class="word-sync-ayah">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
-      <div id="word-sync-status" class="word-sync-meta">تزامن الكلمات جاهز</div>
-    </div>
-
-    <!-- شريط التقدم -->
-    <div class="player-progress-row">
-      <span id="player-current-time">00:00</span>
-      <input type="range" id="player-seek-bar" min="0" max="100" value="0" step="0.1" aria-label="شريط تقدم التلاوة" />
-      <span id="player-total-time">00:00</span>
-    </div>
-
-    <!-- أزرار التحكم الأساسية والمتقدمة -->
-    <div class="player-controls-row">
-      <button id="btn-prev-surah" class="btn btn-outline btn-sm adv-opt" type="button"><span>السورة السابقة</span></button>
-      <button id="btn-prev-ayah" class="btn btn-secondary btn-sm" type="button"><span>الآية السابقة</span></button>
-      <button id="btn-seek-back" class="btn btn-outline btn-sm adv-opt" type="button"><span>-10 ث</span></button>
-
-      <button id="btn-play-pause" class="btn btn-primary btn-play-main" type="button">
-        <span>تشغيل</span>
+    <!-- الشريط المصغّر -->
+    <div class="mini-player">
+      <button id="player-mini-main" class="mini-info" type="button" aria-label="فتح المشغل">
+        <strong id="player-mini-title">سورة الفاتحة</strong>
+        <span id="player-mini-sub">الآية 1</span>
       </button>
-
-      <button id="btn-seek-forward" class="btn btn-outline btn-sm adv-opt" type="button"><span>+10 ث</span></button>
-      <button id="btn-next-ayah" class="btn btn-secondary btn-sm" type="button"><span>الآية التالية</span></button>
-      <button id="btn-next-surah" class="btn btn-outline btn-sm adv-opt" type="button"><span>السورة التالية</span></button>
+      <button id="btn-mini-play" class="icon-btn" type="button" aria-label="تشغيل / إيقاف"><svg class="ic-play" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+      <button id="btn-player-close" class="icon-btn icon-btn-quiet" type="button" aria-label="إغلاق المشغل">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
 
-    <!-- خيارات التكرار والسرعة ومؤقت النوم -->
-    <div class="player-extra-controls adv-opt">
-      <div class="extra-group">
-        <label for="player-repeat-mode">التكرار:</label>
-        <select id="player-repeat-mode" class="select select-sm">
-          <option value="none">بدون تكرار</option>
-          <option value="ayah">تكرار الآية الحالية</option>
-          <option value="range">تكرار نطاق آيات</option>
-          <option value="surah">تكرار السورة</option>
-        </select>
-        <span id="repeat-range-inputs" class="hidden">
-          من <input type="number" id="repeat-from" min="1" value="1" class="input input-xs" />
-          إلى <input type="number" id="repeat-to" min="1" value="7" class="input input-xs" />
-        </span>
-        <span id="repeat-count-wrap" class="hidden">
-          عدد المرات <input type="number" id="repeat-count" min="0" max="99" value="0" class="input input-xs" title="0 = بلا حد" aria-label="عدد مرات التكرار (0 = بلا حد)" />
-        </span>
-      </div>
-
-      <div class="extra-group">
-        <label for="player-speed">السرعة:</label>
-        <select id="player-speed" class="select select-sm">
-          <option value="0.75">0.75x</option>
-          <option value="1" selected>1.0x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-        </select>
-      </div>
-
-      <div class="extra-group">
-        <label for="player-sleep-timer">مؤقت الإيقاف:</label>
-        <select id="player-sleep-timer" class="select select-sm">
-          <option value="0">إيقاف المؤقت</option>
-          <option value="10">بعد 10 دقائق</option>
-          <option value="20">بعد 20 دقيقة</option>
-          <option value="30">بعد 30 دقيقة</option>
-          <option value="60">بعد 60 دقيقة</option>
-          <option value="-1">حتى نهاية السورة</option>
-        </select>
-        <span id="sleep-timer-countdown" class="badge hidden"></span>
-      </div>
-    </div>
-
-    <!-- لوحة التفسير اللحظي أثناء الاستماع -->
-    <div id="live-tafsir-drawer" class="live-tafsir-box">
-      <div class="live-tafsir-header">
-        <div>
-          <strong id="live-tafsir-title">تفسير الآية الحالية (1:1)</strong>
-          <span id="live-tafsir-source" class="badge">التفسير الميسر</span>
+    <!-- النافذة الكاملة -->
+    <div class="player-sheet">
+      <div class="sheet-top">
+        <button id="btn-player-collapse" class="icon-btn icon-btn-quiet" type="button" aria-label="تصغير المشغل">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sheet-title">
+          <strong id="player-surah-title">سورة الفاتحة</strong>
+          <span id="player-reciter-name">مشاري راشد العفاسي</span>
         </div>
-        <div class="live-tafsir-btns">
-          <button id="btn-jump-to-ayah-mushaf" class="btn btn-gold btn-sm" type="button">
-            <span>الانتقال للآية في المصحف</span>
-          </button>
-          <button id="btn-expand-live-tafsir" class="btn btn-outline btn-sm" type="button">
-            <span>تكبير التفسير</span>
-          </button>
-          <button id="btn-hide-live-tafsir" class="btn btn-outline btn-sm" type="button">
-            <span>إخفاء</span>
-          </button>
-        </div>
+        <span id="player-verse-badge" class="badge">الآية 1:1</span>
       </div>
-      <div id="live-tafsir-content" class="live-tafsir-text">
-        ابدأ التلاوة لعرض تفسير كل آية تلقائيًا بالتزامن مع صوت القارئ.
+      <span id="player-offline-indicator" class="badge hidden">تشغيل محلي بدون إنترنت</span>
+
+      <div id="player-word-sync-box" class="word-sync-container">
+        <div id="word-sync-text" class="word-sync-ayah">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
+        <div id="word-sync-status" class="word-sync-meta"></div>
+      </div>
+
+      <div class="player-progress-row">
+        <span id="player-current-time">00:00</span>
+        <input type="range" id="player-seek-bar" min="0" max="100" value="0" step="0.1" aria-label="شريط تقدم التلاوة" />
+        <span id="player-total-time">00:00</span>
+      </div>
+
+      <div class="player-controls-row">
+        <button id="btn-prev-ayah" class="icon-btn" type="button" aria-label="الآية السابقة">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M6 5h2v14H6zM9.5 12L19 5v14z"/></svg>
+        </button>
+        <button id="btn-play-pause" class="icon-btn icon-btn-main" type="button" aria-label="تشغيل / إيقاف"><svg class="ic-play" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+        <button id="btn-next-ayah" class="icon-btn" type="button" aria-label="الآية التالية">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M16 5h2v14h-2zM14.5 12L5 19V5z"/></svg>
+        </button>
+      </div>
+
+      <details class="player-more">
+        <summary>خيارات أخرى</summary>
+        <div class="player-more-row">
+          <button id="btn-prev-surah" class="btn btn-outline btn-sm" type="button"><span>السورة السابقة</span></button>
+          <button id="btn-seek-back" class="btn btn-outline btn-sm" type="button"><span>-10 ث</span></button>
+          <button id="btn-seek-forward" class="btn btn-outline btn-sm" type="button"><span>+10 ث</span></button>
+          <button id="btn-next-surah" class="btn btn-outline btn-sm" type="button"><span>السورة التالية</span></button>
+        </div>
+        <div class="player-extra-controls">
+          <div class="extra-group">
+            <label for="player-repeat-mode">التكرار:</label>
+            <select id="player-repeat-mode" class="select select-sm">
+              <option value="none">بدون تكرار</option>
+              <option value="ayah">تكرار الآية الحالية</option>
+              <option value="range">تكرار نطاق آيات</option>
+              <option value="surah">تكرار السورة</option>
+            </select>
+            <span id="repeat-range-inputs" class="hidden">
+              من <input type="number" id="repeat-from" min="1" value="1" class="input input-xs" />
+              إلى <input type="number" id="repeat-to" min="1" value="7" class="input input-xs" />
+            </span>
+            <span id="repeat-count-wrap" class="hidden">
+              عدد المرات <input type="number" id="repeat-count" min="0" max="99" value="0" class="input input-xs" title="0 = بلا حد" aria-label="عدد مرات التكرار (0 = بلا حد)" />
+            </span>
+          </div>
+          <div class="extra-group">
+            <label for="player-speed">السرعة:</label>
+            <select id="player-speed" class="select select-sm">
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1.0x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </div>
+          <div class="extra-group">
+            <label for="player-sleep-timer">مؤقت الإيقاف:</label>
+            <select id="player-sleep-timer" class="select select-sm">
+              <option value="0">إيقاف المؤقت</option>
+              <option value="10">بعد 10 دقائق</option>
+              <option value="20">بعد 20 دقيقة</option>
+              <option value="30">بعد 30 دقيقة</option>
+              <option value="60">بعد 60 دقيقة</option>
+              <option value="-1">حتى نهاية السورة</option>
+            </select>
+            <span id="sleep-timer-countdown" class="badge hidden"></span>
+          </div>
+        </div>
+      </details>
+
+      <div id="live-tafsir-drawer" class="live-tafsir-box">
+        <div class="live-tafsir-header">
+          <div>
+            <strong id="live-tafsir-title">تفسير الآية الحالية (1:1)</strong>
+            <span id="live-tafsir-source" class="badge">التفسير الميسر</span>
+          </div>
+          <div class="live-tafsir-btns">
+            <button id="btn-jump-to-ayah-mushaf" class="btn btn-gold btn-sm" type="button"><span>الآية في المصحف</span></button>
+            <button id="btn-expand-live-tafsir" class="btn btn-outline btn-sm" type="button"><span>تكبير</span></button>
+          </div>
+        </div>
+        <div id="live-tafsir-content" class="live-tafsir-text">سيظهر تفسير كل آية هنا أثناء التلاوة.</div>
       </div>
     </div>
 

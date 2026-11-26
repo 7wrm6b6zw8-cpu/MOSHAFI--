@@ -13,6 +13,8 @@
   --danger-color: #A63A3A;
   --quran-font-size: 28px;
   --ui-font-size: 16px;
+  --nav-h: 62px;
+  --mini-h: 66px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --shadow-sm: 0 2px 8px rgba(15, 61, 46, 0.06);
@@ -47,12 +49,16 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-main);
   line-height: 1.65;
-  padding-bottom: 240px;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 24px);
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-body.player-minimized {
-  padding-bottom: 85px;
+body.has-player {
+  padding-bottom: calc(var(--nav-h) + var(--mini-h) + env(safe-area-inset-bottom, 0px) + 30px);
+}
+
+body.sheet-open {
+  overflow: hidden;
 }
 
 body.simple-mode .adv-opt {
@@ -67,7 +73,7 @@ body.simple-mode .adv-opt {
 .app-header {
   background-color: var(--green-dark);
   color: #FAF8F3;
-  padding: 14px 24px;
+  padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -106,47 +112,6 @@ body.simple-mode .adv-opt {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-/* Navigation */
-.main-nav {
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  overflow-x: auto;
-  position: sticky;
-  top: 73px;
-  z-index: 90;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.nav-item:hover {
-  background-color: var(--green-soft);
-}
-
-.nav-item.active {
-  background-color: var(--green-dark);
-  color: #FAF8F3;
-  border-color: var(--gold-accent);
 }
 
 /* Layout & Cards */
@@ -512,3 +477,76 @@ body.simple-mode .adv-opt {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ===== الإصدار المبسّط ===== */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.app-header .brand { gap: 10px; }
+.app-header .brand-logo { width: 34px; height: 34px; }
+.app-header h1 { font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
+.app-header .badge { font-size: 0.72rem; padding: 2px 8px; }
+.header-actions { gap: 8px; flex-wrap: nowrap; }
+
+/* شريط التبويبات السفلي */
+.main-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 150;
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 16px rgba(15, 61, 46, 0.08);
+  padding: 0 4px env(safe-area-inset-bottom, 0px);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--nav-h);
+  padding: 6px 2px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-top: 3px solid transparent;
+}
+
+.nav-item.active {
+  color: var(--green-mid);
+  border-top-color: var(--gold-accent);
+}
+
+.app-container { margin: 14px auto; }
+.card, .hero-card { padding: 16px; margin-bottom: 14px; }
+.hero-card { padding: 14px 16px 18px; }
+.hero-ornament { margin-bottom: 0; font-size: 2.2rem; }
+.hero-actions { margin-top: 10px; }
+
+.more-list { display: flex; flex-direction: column; gap: 10px; }
+.more-item {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; padding: 18px 16px;
+  background: var(--bg-surface); color: var(--text-main);
+  border: 1px solid var(--border-color); border-radius: var(--radius-md);
+  font-family: inherit; font-size: 1.05rem; font-weight: 600; cursor: pointer;
+}
+.more-arrow { font-size: 1.6rem; color: var(--gold-dark); line-height: 1; }
+
+.toolbar-more { margin-top: 8px; }
+.toolbar-more summary, .player-more summary {
+  cursor: pointer; font-weight: 600; color: var(--green-mid);
+  padding: 6px 0; list-style-position: inside;
+}
+.toolbar-more .toolbar-group { margin-top: 8px; }

@@ -10,7 +10,7 @@ const DEFAULT_STATE = {
   reciterId: 7, // Mishary Rashid Alafasy on Quran.com API v4
   tafsirId: 16, // التفسير الميسر
   playbackRate: 1,
-  simpleMode: false,
+  simpleMode: true,
   lastReading: { surah: 1, ayah: 1, page: 1 },
   lastListening: { surah: 1, ayah: 1, reciterId: 7, time: 0 },
   pageBookmarks: [],
@@ -45,7 +45,9 @@ export class StorageManager {
   getSettings() {
     try {
       const saved = JSON.parse(localStorage.getItem('moshafi_settings') || '{}');
-      return { ...DEFAULT_STATE, ...saved };
+      const merged = { ...DEFAULT_STATE, ...saved };
+      if (saved.uiVersion !== 2) merged.simpleMode = true; // الواجهة المبسّطة افتراضيًا (مرة واحدة)
+      return merged;
     } catch {
       return { ...DEFAULT_STATE };
     }
@@ -53,7 +55,7 @@ export class StorageManager {
 
   saveSettings(partial) {
     const current = this.getSettings();
-    const updated = { ...current, ...partial };
+    const updated = { ...current, ...partial, uiVersion: 2 };
     localStorage.setItem('moshafi_settings', JSON.stringify(updated));
     return updated;
   }

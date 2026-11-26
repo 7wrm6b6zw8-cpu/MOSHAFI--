@@ -48,12 +48,6 @@ export class AudioPlayerManager {
     this.currentVerseKey = `${this.currentSurah}:${settings.lastListening?.ayah || 1}`;
     this.audio.playbackRate = settings.playbackRate || 1;
 
-    // على الموبايل يبدأ المشغل مصغّرًا حتى لا يغطي نص المصحف
-    if (window.matchMedia('(max-width: 680px)').matches) {
-      document.getElementById('persistent-player').classList.add('minimized');
-      document.body.classList.add('player-minimized');
-      document.getElementById('btn-toggle-player-size').querySelector('span').textContent = 'تكبير المشغل';
-    }
     this.bindControls();
     this.setupMediaSession();
     this.updateHeaderDisplay();
@@ -101,21 +95,13 @@ export class AudioPlayerManager {
       this.setSleepTimer(parseInt(e.target.value, 10));
     });
 
-    // Minimize / Expand dock
-    document.getElementById('btn-toggle-player-size').addEventListener('click', () => {
-      const dock = document.getElementById('persistent-player');
-      const isMin = dock.classList.toggle('minimized');
-      document.body.classList.toggle('player-minimized', isMin);
-      document.getElementById('btn-toggle-player-size').querySelector('span').textContent = isMin ? 'تكبير المشغل' : 'تصغير المشغل';
-    });
+    // المشغل: شريط مصغّر ↔ نافذة كاملة
+    document.getElementById('player-mini-main').addEventListener('click', () => this.openSheet());
+    document.getElementById('btn-player-collapse').addEventListener('click', () => this.closeSheet());
+    document.getElementById('player-backdrop').addEventListener('click', () => this.closeSheet());
+    document.getElementById('btn-mini-play').addEventListener('click', () => this.togglePlay());
+    document.getElementById('btn-player-close').addEventListener('click', () => this.closePlayer());
 
-    // Live Tafsir drawer buttons
-    document.getElementById('btn-toggle-live-tafsir').addEventListener('click', () => {
-      document.getElementById('live-tafsir-drawer').classList.toggle('hidden');
-    });
-    document.getElementById('btn-hide-live-tafsir').addEventListener('click', () => {
-      document.getElementById('live-tafsir-drawer').classList.add('hidden');
-    });
     document.getElementById('btn-jump-to-ayah-mushaf').addEventListener('click', () => {
       if (this.onJumpToMushaf) this.onJumpToMushaf(this.currentVerseKey);
     });
@@ -133,13 +119,13 @@ export class AudioPlayerManager {
 
     // Audio element events
     this.audio.addEventListener('play', () => {
-      document.getElementById('btn-play-pause').querySelector('span').textContent = 'إيقاف مؤقت';
+      this.setPlayingUI(true);
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
       this.startSyncLoop();
     });
 
     this.audio.addEventListener('pause', () => {
-      document.getElementById('btn-play-pause').querySelector('span').textContent = 'تشغيل';
+      this.setPlayingUI(false);
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
       this.stopSyncLoop();
       this.saveListening();
@@ -177,6 +163,36 @@ export class AudioPlayerManager {
     document.getElementById('player-surah-title').textContent = ch ? `سورة ${ch.name_arabic}` : `سورة ${this.currentSurah}`;
     document.getElementById('player-reciter-name').textContent = rec ? rec.name : 'قارئ معتمد';
     document.getElementById('player-verse-badge').textContent = `الآية ${this.currentVerseKey}`;
+    document.getElementById('player-mini-title').textContent = ch ? `سورة ${ch.name_arabic}` : `سورة ${this.currentSurah}`;
+    document.getElementById('player-mini-sub').textContent =
+      `${rec ? rec.name : 'قارئ معتمد'} · آية ${this.currentVerseKey.split(':')[1] || 1}`;
+  }
+
+  // ===== واجهة المشغل (شريط مصغّر + نافذة كاملة) =====
+  setPlayingUI(isPlaying) {
+    document.getElementById('persistent-player').classList.toggle('is-playing', isPlaying);
+  }
+
+  showPlayer() {
+    document.getElementById('persistent-player').classList.add('has-track');
+    document.body.classList.add('has-player');
+  }
+
+  openSheet() {
+    document.getElementById('persistent-player').classList.add('sheet-open');
+    document.body.classList.add('sheet-open');
+  }
+
+  closeSheet() {
+    document.getElementById('persistent-player').classList.remove('sheet-open');
+    document.body.classList.remove('sheet-open');
+  }
+
+  closePlayer() {
+    this.audio.pause();
+    this.closeSheet();
+    document.getElementById('persistent-player').classList.remove('has-track');
+    document.body.classList.remove('has-player');
   }
 
   async loadAndPlaySurah(surahId, startAyah = 1, reciterId = null, startTime = null) {
@@ -192,12 +208,7 @@ export class AudioPlayerManager {
     document.getElementById('word-sync-text').dataset.renderedVerse = '';
     this.updateHeaderDisplay();
 
-    // التوسيع التلقائي على الشاشات الواسعة فقط؛ على الموبايل يتحكم المستخدم بزر التكبير
-    if (!window.matchMedia('(max-width: 680px)').matches) {
-      document.getElementById('persistent-player').classList.remove('minimized');
-      document.body.classList.remove('player-minimized');
-      document.getElementById('btn-toggle-player-size').querySelector('span').textContent = 'تصغير المشغل';
-    }
+    this.showPlayer();
 
     const pkgKey = `${this.currentReciterId}_${surahId}`;
     const offlinePkg = await this.storage.getRecord('surah_packages', pkgKey);
@@ -486,6 +497,7 @@ export class AudioPlayerManager {
     if (req !== this.tafsirReq) return; // وصل طلب أحدث
     document.getElementById('live-tafsir-source').textContent = res.sourceName;
     document.getElementById('live-tafsir-content').textContent = res.text;
+    if (res.error) setTimeout(() => { if (this.lastTafsirFetchedVerse === verseKey) this.lastTafsirFetchedVerse = null; }, 8000);
   }
 
   updateProgressUI() {

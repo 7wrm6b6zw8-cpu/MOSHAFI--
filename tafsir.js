@@ -7,6 +7,14 @@ export const TAFSIR_SOURCES = {
   91: 'تفسير السعدي'
 };
 
+// أسماء ملفات المصدر الاحتياطي (spa5k/tafsir_api عبر jsDelivr)
+const TAFSIR_SLUGS = {
+  16: 'ar-tafsir-muyassar',
+  14: 'ar-tafsir-ibn-kathir',
+  15: 'ar-tafsir-al-tabari',
+  91: 'ar-tafseer-al-saddi'
+};
+
 export class TafsirManager {
   constructor(storage) {
     this.storage = storage;
@@ -19,53 +27,65 @@ export class TafsirManager {
     return doc.body.textContent || '';
   }
 
-  async getAyahTafsir(verseKey, tafsirId = 16) {
-    const cacheKey = `${tafsirId}_${verseKey}`;
-    // 1. Check IndexedDB first (works offline & speeds up repeated access)
-    const cached = await this.storage.getRecord('tafsir_cache', cacheKey);
-    if (cached && cached.text) {
-      return {
-        verseKey,
-        tafsirId,
-        sourceName: TAFSIR_SOURCES[tafsirId] || 'تفسير موثق',
-        text: cached.text,
-        offline: true
-      };
-    }
-
-    // 2. Fetch from official Quran.com API v4
+  async fetchJson(url, timeoutMs = 12000) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-      const url = `${API_BASE}/tafsirs/${tafsirId}/by_ayah/${encodeURIComponent(verseKey)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('تعذر جلب التفسير من المصدر');
-      const data = await res.json();
-      const rawText = data?.tafsir?.text || '';
-      const cleanText = this.cleanHtml(rawText).trim() || 'لا يتوفر نص تفسير لهذه الآية في المصدر المختار.';
+      const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } finally {
+      clearTimeout(t);
+    }
+  }
 
-      await this.storage.putRecord('tafsir_cache', {
-        key: cacheKey,
-        verseKey,
-        tafsirId,
-        text: cleanText,
-        updatedAt: Date.now()
-      });
+  // المصدر 1: Quran.com API — المصدر 2 (احتياطي): ملفات تفسير ثابتة على jsDelivr
+  async fetchTafsirText(verseKey, tafsirId) {
+    const errors = [];
+    try {
+      const data = await this.fetchJson(`${API_BASE}/tafsirs/${tafsirId}/by_ayah/${verseKey}`);
+      const text = this.cleanHtml(data?.tafsir?.text || '').trim();
+      if (text) return text;
+      errors.push('API: نص فارغ');
+    } catch (e) { errors.push(`API: ${e.message}`); }
 
-      return {
-        verseKey,
-        tafsirId,
-        sourceName: TAFSIR_SOURCES[tafsirId] || 'تفسير موثق',
-        text: cleanText,
-        offline: false
-      };
+    const slug = TAFSIR_SLUGS[tafsirId];
+    if (slug) {
+      const [surah, ayah] = verseKey.split(':');
+      try {
+        const data = await this.fetchJson(`https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir/${slug}/${surah}/${ayah}.json`);
+        const text = this.cleanHtml(data?.text || '').trim();
+        if (text) return text;
+        errors.push('CDN: نص فارغ');
+      } catch (e) { errors.push(`CDN: ${e.message}`); }
+    }
+    const err = new Error(errors.join(' | '));
+    err.details = errors;
+    throw err;
+  }
+
+  async getAyahTafsir(verseKey, tafsirId = 16) {
+    const sourceName = TAFSIR_SOURCES[tafsirId] || 'تفسير موثق';
+    const cacheKey = `${tafsirId}_${verseKey}`;
+
+    // 1) المخزّن محليًا (يعمل بدون إنترنت)
+    try {
+      const cached = await this.storage.getRecord('tafsir_cache', cacheKey);
+      if (cached && cached.text) return { verseKey, tafsirId, sourceName, text: cached.text, offline: true };
+    } catch {}
+
+    // 2) من الإنترنت
+    try {
+      const text = await this.fetchTafsirText(verseKey, tafsirId);
+      try {
+        await this.storage.putRecord('tafsir_cache', { key: cacheKey, verseKey, tafsirId, text, updatedAt: Date.now() });
+      } catch {}
+      return { verseKey, tafsirId, sourceName, text, offline: false };
     } catch (err) {
-      return {
-        verseKey,
-        tafsirId,
-        sourceName: TAFSIR_SOURCES[tafsirId] || 'تفسير موثق',
-        text: 'أنت غير متصل بالإنترنت ولم يتم تنزيل تفسير هذه السورة مسبقًا. يمكنك تنزيل السورة من قسم التنزيلات لقراءة التفسير بدون إنترنت.',
-        offline: true,
-        error: true
-      };
+      const reason = navigator.onLine
+        ? `تعذّر تحميل التفسير الآن، سنعيد المحاولة تلقائيًا.\n(تفاصيل: ${err.message})`
+        : 'لا يوجد اتصال بالإنترنت، ولم يُنزَّل تفسير هذه الآية. نزّل السورة من «المزيد ← التنزيلات» لقراءة التفسير بدون إنترنت.';
+      return { verseKey, tafsirId, sourceName, text: reason, offline: !navigator.onLine, error: true };
     }
   }
 
