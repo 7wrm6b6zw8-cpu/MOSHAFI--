@@ -1,5 +1,5 @@
 // عند كل نشر جديد: غيّر رقم VERSION ليتجدد الكاش (والـ shell يتحدّث تلقائيًا أيضًا بنمط stale-while-revalidate)
-const VERSION = 'v3';
+const VERSION = 'v4-flat';
 const APP_SHELL_CACHE = `moshafi-shell-${VERSION}`;
 const RUNTIME_CACHE = `moshafi-runtime-${VERSION}`;
 const AUDIO_CACHE = 'moshafi-audio-v1'; // يديره التطبيق (التنزيلات) ولا يُحذف هنا
@@ -7,11 +7,11 @@ const RUNTIME_MAX_ENTRIES = 200;
 
 const SHELL_ASSETS = [
   './', './index.html', './manifest.json',
-  './css/main.css', './css/mushaf.css', './css/player.css', './css/responsive.css',
-  './js/app.js', './js/mushaf.js', './js/audio.js', './js/word-sync.js', './js/tafsir.js',
-  './js/search.js', './js/storage.js', './js/config.js', './js/data.js', './js/quran-api.js', './js/progress.js',
-  './assets/icons/icon-192.png', './assets/icons/icon-512.png',
-  './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-512.png'
+  './main.css', './mushaf.css', './player.css', './responsive.css',
+  './app.js', './mushaf.js', './audio.js', './word-sync.js', './tafsir.js',
+  './search.js', './storage.js', './config.js', './data.js', './quran-api.js', './progress.js',
+  './icon-192.png', './icon-512.png',
+  './icon-maskable-192.png', './icon-maskable-512.png'
 ];
 
 self.addEventListener('install', (event) => {

@@ -322,7 +322,7 @@ export class AudioPlayerManager {
       title: ch ? `سورة ${ch.name_arabic}` : `سورة ${this.currentSurah}`,
       artist: rec ? rec.name : 'قارئ',
       album: 'مصحفي',
-      artwork: [{ src: './assets/icons/icon-512.png', sizes: '512x512', type: 'image/png' }]
+      artwork: [{ src: './icon-512.png', sizes: '512x512', type: 'image/png' }]
     });
   }
 
