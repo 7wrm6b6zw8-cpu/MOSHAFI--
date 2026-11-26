@@ -1,0 +1,194 @@
+.mushaf-toolbar {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mushaf-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.mushaf-workspace.with-tafsir {
+  grid-template-columns: 1.45fr 1fr;
+}
+
+.mushaf-reader-wrapper {
+  background-color: var(--bg-surface);
+  border: 2px solid var(--gold-accent);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.mushaf-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+.mushaf-page-frame {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 26px 24px;
+  min-height: 460px;
+  font-family: 'Amiri Quran', serif;
+  font-size: var(--quran-font-size);
+  line-height: 2.35;
+  text-align: justify;
+  direction: rtl;
+  user-select: text;
+}
+
+.surah-banner-ornament {
+  text-align: center;
+  background-color: var(--green-soft);
+  border: 1px solid var(--gold-accent);
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin: 16px 0 12px;
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.35rem;
+  color: var(--green-dark);
+}
+
+.bismillah-line {
+  text-align: center;
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.25em;
+  color: var(--text-main);
+  margin-bottom: 14px;
+}
+
+/* وضع صفحات المصحف المتصل */
+.ayah-inline {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px 4px;
+  transition: background-color 0.2s ease;
+}
+
+.ayah-inline:hover {
+  background-color: var(--green-soft);
+}
+
+.ayah-inline.active-ayah,
+.ayah-card-item.active-ayah {
+  background-color: rgba(198, 168, 107, 0.28);
+  outline: 1px solid var(--gold-accent);
+}
+
+.ayah-end-symbol {
+  color: var(--gold-dark);
+  font-size: 0.85em;
+  margin: 0 4px;
+  white-space: nowrap;
+}
+
+/* وضع عرض الآيات المنفصلة */
+.ayah-card-item {
+  display: block;
+  text-align: right;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.ayah-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+}
+
+.ayah-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.mushaf-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* لوحة التفسير المدمجة */
+.tafsir-panel {
+  background-color: var(--bg-surface);
+  border: 2px solid var(--green-dark);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: sticky;
+  top: 135px;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.tafsir-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tafsir-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tafsir-arabic-preview {
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.35rem;
+  background-color: var(--bg-primary);
+  padding: 12px;
+  border-radius: 10px;
+  border-right: 3px solid var(--gold-accent);
+  margin-bottom: 14px;
+}
+
+.tafsir-text {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--text-main);
+  margin-bottom: 16px;
+}
+
+.tafsir-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,45 @@
+@media (max-width: 960px) {
+  .mushaf-workspace.with-tafsir {
+    grid-template-columns: 1fr;
+  }
+
+  .tafsir-panel {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .main-nav {
+    top: 0;
+    justify-content: flex-start;
+  }
+
+  .mushaf-page-frame {
+    padding: 16px 14px;
+    line-height: 2.15;
+  }
+
+  .player-dock {
+    padding: 10px 12px;
+  }
+
+  /* المشغل الموسّع لا يغطي النص: ارتفاع محدود مع تمرير داخلي */
+  .player-dock:not(.minimized) {
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  body:not(.player-minimized) {
+    padding-bottom: 46vh;
+  }
+
+  .word-sync-ayah {
+    font-size: 1.2rem;
+  }
+}
