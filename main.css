@@ -13,6 +13,9 @@
   --danger-color: #A63A3A;
   --quran-font-size: 28px;
   --ui-font-size: 16px;
+  --accent-text: #0F3D2E;
+  --header-bg: #0F3D2E;
+  --paper: #FBF8EF;
   --nav-h: 62px;
   --mini-h: 66px;
   --radius-md: 12px;
@@ -22,6 +25,9 @@
 }
 
 [data-theme="dark"] {
+  --accent-text: #8FD6B6;
+  --header-bg: #0B2A21;
+  --paper: #16231F;
   --bg-primary: #101916;
   --bg-surface: #172420;
   --bg-surface-alt: #1E2E29;
@@ -71,9 +77,9 @@ body.simple-mode .adv-opt {
 
 /* Header */
 .app-header {
-  background-color: var(--green-dark);
+  background-color: var(--header-bg);
   color: #FAF8F3;
-  padding: 10px 16px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -153,7 +159,7 @@ body.simple-mode .adv-opt {
 .hero-ornament {
   font-family: 'Amiri Quran', serif;
   font-size: 2rem;
-  color: var(--green-dark);
+  color: var(--accent-text);
   margin-bottom: 8px;
 }
 
@@ -217,7 +223,7 @@ body.simple-mode .adv-opt {
 
 .btn-secondary {
   background-color: var(--green-soft);
-  color: var(--green-dark);
+  color: var(--accent-text);
   border-color: var(--green-dark);
 }
 
@@ -272,7 +278,7 @@ body.simple-mode .adv-opt {
   font-size: 0.8rem;
   font-weight: 600;
   background-color: var(--green-soft);
-  color: var(--green-dark);
+  color: var(--accent-text);
 }
 
 .badge-online {
@@ -329,7 +335,7 @@ body.simple-mode .adv-opt {
   height: 34px;
   border-radius: 50%;
   background-color: var(--green-soft);
-  color: var(--green-dark);
+  color: var(--accent-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -340,7 +346,7 @@ body.simple-mode .adv-opt {
 .surah-name-ar {
   font-family: 'Amiri Quran', serif;
   font-size: 1.35rem;
-  color: var(--green-dark);
+  color: var(--accent-text);
 }
 
 .surah-card-actions {
@@ -550,3 +556,114 @@ body.simple-mode .adv-opt {
   padding: 6px 0; list-style-position: inside;
 }
 .toolbar-more .toolbar-group { margin-top: 8px; }
+
+
+/* ===== الجولة الثانية: ألوان موحّدة، قوائم أنظف، وضع قراءة كامل ===== */
+html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+body { overflow-x: hidden; touch-action: manipulation; }
+.input, .select { font-size: 16px; }
+:root { --bottom-ui: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); }
+body.has-player { --bottom-ui: calc(var(--nav-h) + var(--mini-h) + env(safe-area-inset-bottom, 0px)); }
+
+/* أزرار: لغة ألوان واحدة */
+.btn { border: 1px solid transparent; font-weight: 600; }
+.btn-secondary { background-color: var(--green-soft); color: var(--accent-text); border-color: transparent; }
+.btn-outline { background-color: transparent; border-color: var(--border-color); color: var(--text-main); }
+.btn-gold { background-color: var(--gold-accent); color: #2A2008; }
+.btn-danger { background-color: transparent; color: var(--danger-color); border-color: var(--danger-color); }
+[data-theme="dark"] .btn-danger { color: #F0A3A3; border-color: #8B4A4A; }
+.btn-toggle { background-color: var(--green-soft); color: var(--accent-text); }
+.btn-toggle.active { background-color: var(--green-dark); color: #FAF8F3; }
+
+.icon-btn-header { width: 42px; height: 42px; color: #FAF8F3; }
+.icon-btn-header:active { background: rgba(250, 248, 243, 0.14); }
+[data-theme="light"] .ic-sun, [data-theme="dark"] .ic-moon { display: none; }
+.app-header .brand-logo { border-radius: 10px; }
+.header-actions { gap: 2px; }
+
+/* الرئيسية: البسملة كاملة */
+.hero-card { overflow: visible; text-align: center; }
+.hero-ornament {
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.75rem;
+  line-height: 1.9;
+  color: var(--accent-text);
+  margin: 2px 0 6px;
+  white-space: normal;
+}
+
+/* قوائم السور: صفوف مرتبة بدل بطاقات كبيرة */
+.surah-grid { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
+.surah-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 2px; margin: 0;
+  background: transparent; border: none; border-radius: 0;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: none;
+}
+.surah-card:last-child { border-bottom: none; }
+.surah-card:hover { background: transparent; transform: none; box-shadow: none; }
+.surah-card-top { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; margin: 0; }
+.surah-number {
+  flex: none; width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--green-soft); color: var(--accent-text);
+  font-size: 0.85rem; font-weight: 700;
+}
+.surah-name-ar { flex: 1; min-width: 0; font-family: 'Amiri Quran', serif; font-size: 1.2rem; color: var(--text-main); }
+.surah-card-top .badge { flex: none; font-size: 0.7rem; padding: 2px 8px; background: var(--green-soft); color: var(--accent-text); }
+.surah-card-actions { display: flex; gap: 6px; flex: none; }
+.surah-card .btn-sm { padding: 6px 12px; }
+
+/* زر تنزيل صغير على شكل حبة */
+.dl-btn {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--green-dark); background: transparent; color: var(--accent-text);
+  font-family: inherit; font-size: 0.85rem; font-weight: 600;
+}
+.dl-btn:disabled { cursor: default; }
+.dl-btn.is-done { background: var(--green-soft); border-color: transparent; }
+.dl-btn[data-busy] { opacity: 0.8; }
+
+/* صفحة التنزيلات */
+.dl-summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dl-summary h2 { font-size: 1.3rem; line-height: 1.3; }
+.list-title { font-size: 1rem; color: var(--text-muted); margin: 14px 0 6px; font-weight: 600; }
+.downloads-list { display: flex; flex-direction: column; }
+.download-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 2px; border-bottom: 1px solid var(--border-color);
+  background: transparent; border-radius: 0; margin: 0;
+}
+.download-item:last-child { border-bottom: none; }
+.download-info { display: flex; flex-direction: column; min-width: 0; line-height: 1.4; }
+.download-info .subtitle { font-size: 0.8rem; color: var(--text-muted); }
+.empty-state { color: var(--text-muted); font-size: 0.92rem; padding: 6px 0; }
+#downloads-filter { width: 100%; margin: 4px 0 6px; }
+.note-details { margin-top: 14px; }
+.note-details summary { cursor: pointer; color: var(--text-muted); font-size: 0.88rem; }
+.notice-bar { font-size: 0.85rem; }
+
+/* وضع القراءة: الصفحة كلها للمصحف */
+body.reading .app-header { display: none; }
+body.reading { padding-bottom: 0; }
+body.reading .app-container { max-width: none; margin: 0; padding: 0; }
+body.reading #view-mushaf.active { display: block; }
+
+.more-list { margin-top: 2px; }
+
+/* تصحيحات */
+.btn { white-space: nowrap; }
+.surah-card { flex-direction: row; justify-content: flex-start; flex-wrap: nowrap; }
+.surah-card-top { justify-content: flex-start; }
+.app-header .icon-btn-header { color: #FAF8F3; }
+.dl-summary .subtitle { font-size: 0.85rem; display: block; line-height: 1.5; }
+
+#batch-group-select { flex: 1; min-width: 0; width: auto; }
+
+/* صفوف السور على الشاشات الصغيرة */
+.surah-name-ar { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 520px) {
+  .surah-card-top .badge { display: none; }
+  .surah-card .btn-sm { padding: 6px 11px; font-size: 0.82rem; }
+}

@@ -3,20 +3,11 @@
     grid-template-columns: 1fr;
   }
 
-  .tafsir-panel {
-    position: static;
-    max-height: none;
-  }
 }
 
 @media (max-width: 680px) {
-  .app-header { padding: 8px 12px; }
+  .app-header { padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; }
   .app-container { padding: 0 12px; }
-
-  .mushaf-page-frame {
-    padding: 16px 14px;
-    line-height: 2.15;
-  }
 
   .word-sync-ayah {
     font-size: 1.25rem;

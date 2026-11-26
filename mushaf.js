@@ -31,6 +31,21 @@ export class MushafManager {
   }
 
   bindEvents() {
+    // أدوات القارئ (تظهر عند الطلب فقط حتى تبقى الصفحة كاملة)
+    const toolsBtn = document.getElementById('btn-reader-tools');
+    toolsBtn.addEventListener('click', () => {
+      const panel = document.getElementById('reader-tools');
+      const open = panel.classList.toggle('hidden') === false;
+      toolsBtn.setAttribute('aria-expanded', String(open));
+      requestAnimationFrame(() => this.fitPage());
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this.fitPage(), 120);
+    });
+
     document.getElementById('btn-mode-page').addEventListener('click', () => this.setMode('page'));
     document.getElementById('btn-mode-verse').addEventListener('click', () => this.setMode('verse'));
 
@@ -153,7 +168,7 @@ export class MushafManager {
     this.currentPage = Math.max(1, Math.min(604, pageNumber));
     document.getElementById('mushaf-page-input').value = this.currentPage;
     document.getElementById('pagination-indicator').textContent = `صفحة ${this.currentPage} / 604`;
-    document.getElementById('meta-page-num').textContent = `صفحة ${this.currentPage} من 604`;
+    document.getElementById('meta-page-num').textContent = `صفحة ${this.currentPage}`;
 
     const container = document.getElementById('mushaf-content');
     container.innerHTML = '<div class="loading-state">جارٍ تحميل الصفحة بالرسم العثماني الموثق...</div>';
@@ -176,7 +191,7 @@ export class MushafManager {
       this.currentSurah = first.chapter_id;
       const ch = this.chapters.find(c => c.id === first.chapter_id);
       document.getElementById('meta-surah-name').textContent = ch ? `سورة ${ch.name_arabic}` : `سورة ${first.chapter_id}`;
-      document.getElementById('meta-juz-info').textContent = `الجزء ${first.juz_number} — الحزب ${first.hizb_number}`;
+      document.getElementById('meta-juz-info').textContent = `الجزء ${first.juz_number}`;
       document.getElementById('mushaf-surah-select').value = first.chapter_id;
       document.getElementById('mushaf-juz-select').value = first.juz_number;
 
@@ -252,6 +267,13 @@ export class MushafManager {
     }
 
     container.innerHTML = html;
+    container.classList.toggle('mode-verse', this.mode === 'verse');
+    container.style.fontSize = '';
+    container.scrollTop = 0;
+    if (this.mode === 'page') {
+      this.fitPage();
+      document.fonts?.ready?.then(() => this.fitPage());
+    }
 
     // Bind clicks on verses
     container.querySelectorAll('[data-verse-key]').forEach(el => {
@@ -271,6 +293,20 @@ export class MushafManager {
       const targetEl = container.querySelector(`[data-verse-key="${highlightVerseKey}"]`);
       if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  }
+
+  // يضبط حجم الخط ليظهر نص الصفحة كاملًا في الشاشة بدون تمرير، مثل المصحف الورقي
+  fitPage() {
+    const el = document.getElementById('mushaf-content');
+    if (!el || this.mode !== 'page' || !el.querySelector('.ayah-inline')) return;
+    if (el.clientHeight < 120) return; // القسم مخفي حاليًا
+    let lo = 12, hi = 34, best = 12;
+    for (let i = 0; i < 9; i++) {
+      const mid = (lo + hi) / 2;
+      el.style.fontSize = `${mid}px`;
+      if (el.scrollHeight <= el.clientHeight + 1) { best = mid; lo = mid; } else { hi = mid; }
+    }
+    el.style.fontSize = `${best}px`;
   }
 
   highlightPlayingVerse(verseKey) {

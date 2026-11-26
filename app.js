@@ -156,6 +156,7 @@ class MoshafiApp {
     document.getElementById('tafsir-source-select').value = s.tafsirId;
     document.getElementById('setting-playback-rate').value = s.playbackRate;
     document.getElementById('player-speed').value = s.playbackRate;
+    this.player?.syncOptionChips?.();
     document.getElementById('setting-simple-mode').checked = Boolean(s.simpleMode);
 
     // Home resume buttons
@@ -196,11 +197,16 @@ class MoshafiApp {
     if (push && cur !== viewName) history.pushState({ view: viewName }, '');
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(btn => {
-      const inMore = ['downloads', 'bookmarks', 'settings'].includes(viewName);
+      const inMore = ['bookmarks', 'settings', 'search'].includes(viewName);
       btn.classList.toggle('active', btn.dataset.view === (inMore ? 'more' : viewName));
     });
     const target = document.getElementById(`view-${viewName}`);
     if (target) target.classList.add('active');
+
+    // وضع القراءة: الصفحة كلها للمصحف (بدون الشريط العلوي)
+    document.body.classList.toggle('reading', viewName === 'mushaf');
+    window.scrollTo(0, 0);
+    if (viewName === 'mushaf') requestAnimationFrame(() => this.mushaf.fitPage());
 
     this.updateWakeLock();
     if (viewName === 'bookmarks') this.renderBookmarksView();
@@ -257,7 +263,7 @@ class MoshafiApp {
         </div>
         <div class="surah-card-actions">
           <button class="btn btn-primary btn-sm" data-listen-surah="${c.id}" type="button"><span>تشغيل التلاوة</span></button>
-          <button class="btn btn-outline btn-sm" data-dl-surah="${c.id}" type="button"><span>تنزيل</span></button>
+          <button class="dl-btn" data-dl-surah="${c.id}" type="button"><span>تنزيل</span></button>
         </div>
       </div>
     `).join('');
@@ -280,18 +286,20 @@ class MoshafiApp {
     const recId = this.storage.getSettings().reciterId || 7;
     if (triggerBtn) {
       triggerBtn.disabled = true;
-      triggerBtn.querySelector('span').textContent = 'جارٍ التنزيل 0%...';
+      triggerBtn.dataset.busy = '1';
+      triggerBtn.querySelector('span').textContent = '0%';
     }
     try {
       await this.player.downloadSurahForOffline(surahId, recId, (pct) => {
         if (triggerBtn) triggerBtn.querySelector('span').textContent = `${pct}%`;
       });
       this.showToast('اكتمل تنزيل السورة (الصوت + صفحات المصحف + التفسير + التوقيتات) للعمل بدون إنترنت.');
-      if (triggerBtn) triggerBtn.querySelector('span').textContent = 'تم التنزيل';
+      if (triggerBtn) delete triggerBtn.dataset.busy;
       await this.refreshDownloadsView();
     } catch (err) {
       this.showToast(err?.message?.includes('CORS') ? err.message : 'تعذر إكمال التنزيل. تحقق من الاتصال بالإنترنت.');
       if (triggerBtn) {
+        delete triggerBtn.dataset.busy;
         triggerBtn.disabled = false;
         triggerBtn.querySelector('span').textContent = 'تنزيل';
       }
@@ -302,18 +310,18 @@ class MoshafiApp {
     const packages = await this.storage.getAllRecords('surah_packages');
     const usage = await this.storage.estimateStorageUsage();
     document.getElementById('storage-usage-text').textContent =
-      `المساحة المستخدمة: ${usage.usedMB} ميجابايت (السور المحفوظة: ${packages.length})`;
+      `${usage.usedMB} ميجابايت مستخدمة · ${packages.length} سورة منزّلة`;
 
     this.downloadedSurahIds = new Set(packages.filter(p => p.reciterId === (this.storage.getSettings().reciterId || 7)).map(p => p.surahId));
     const dlList = document.getElementById('downloaded-surahs-list');
     if (packages.length === 0) {
-      dlList.innerHTML = '<p class="empty-state">لا توجد سور منزّلة حاليًا.</p>';
+      dlList.innerHTML = '<p class="empty-state">لا توجد سور منزّلة بعد.</p>';
     } else {
       dlList.innerHTML = packages.map(pkg => `
         <div class="download-item">
-          <div>
-            <strong>سورة ${esc(pkg.surahName)}</strong> — <span>${esc(pkg.reciterName)}</span>
-            <div class="subtitle">الحجم: ${(pkg.sizeBytes / (1024 * 1024)).toFixed(2)} MB | تاريخ التنزيل: ${pkg.downloadedAt} | حالة: مكتمل</div>
+          <div class="download-info">
+            <strong>سورة ${esc(pkg.surahName)}</strong>
+            <span class="subtitle">${(pkg.sizeBytes / (1024 * 1024)).toFixed(1)} MB · ${esc(pkg.reciterName)}</span>
           </div>
           <div class="surah-card-actions">
             <button class="btn btn-primary btn-sm" data-play-offline="${pkg.surahId}" data-rec="${pkg.reciterId}" type="button"><span>تشغيل</span></button>
@@ -341,28 +349,42 @@ class MoshafiApp {
     }
 
     const availEl = document.getElementById('available-downloads-list');
+    const dlIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>';
     availEl.innerHTML = this.chapters.map(c => `
-      <div class="surah-card">
+      <div class="surah-card" data-name="${normalizeArabic(c.name_arabic)}" data-id="${c.id}">
         <div class="surah-card-top">
           <span class="surah-number">${c.id}</span>
           <span class="surah-name-ar">سورة ${c.name_arabic}</span>
         </div>
-        <button class="btn btn-secondary btn-sm" data-dl-pkg-surah="${c.id}" type="button"><span>تنزيل</span></button>
+        <button class="dl-btn" data-dl-pkg-surah="${c.id}" type="button">${dlIcon}<span>تنزيل</span></button>
       </div>
     `).join('');
 
     availEl.querySelectorAll('[data-dl-pkg-surah]').forEach(btn => {
       btn.addEventListener('click', () => this.triggerSurahDownload(parseInt(btn.dataset.dlPkgSurah, 10), btn));
     });
+    this.applyDownloadFilter();
+
     document.querySelectorAll('[data-dl-pkg-surah], [data-dl-surah]').forEach(btn => {
       const id = parseInt(btn.dataset.dlPkgSurah || btn.dataset.dlSurah, 10);
+      const span = btn.querySelector('span');
       if (this.downloadedSurahIds.has(id)) {
-        btn.querySelector('span').textContent = 'منزّلة ✓';
+        span.textContent = 'تم التنزيل';
         btn.disabled = true;
-      } else if (!btn.disabled || btn.querySelector('span').textContent === 'منزّلة ✓') {
-        btn.querySelector('span').textContent = 'تنزيل';
+        btn.classList.add('is-done');
+      } else if (!btn.dataset.busy) {
+        span.textContent = 'تنزيل';
         btn.disabled = false;
+        btn.classList.remove('is-done');
       }
+    });
+  }
+
+  applyDownloadFilter() {
+    const input = document.getElementById('downloads-filter');
+    const q = normalizeArabic(input?.value?.trim() || '');
+    document.querySelectorAll('#available-downloads-list .surah-card').forEach(row => {
+      row.classList.toggle('hidden', Boolean(q) && !row.dataset.name.includes(q) && row.dataset.id !== q);
     });
   }
 
@@ -670,6 +692,7 @@ class MoshafiApp {
       this.triggerSurahDownload(this.mushaf.currentSurah, e.currentTarget);
     });
 
+    document.getElementById('downloads-filter').addEventListener('input', () => this.applyDownloadFilter());
     document.getElementById('btn-clear-all-downloads').addEventListener('click', async () => {
       await this.storage.clearAllOfflineData();
       this.showToast('تم حذف جميع التنزيلات.');
@@ -739,6 +762,7 @@ class MoshafiApp {
       this.storage.saveSettings({ playbackRate: r });
       this.player.audio.playbackRate = r;
       document.getElementById('player-speed').value = r;
+      this.player.syncOptionChips();
     });
     document.getElementById('setting-simple-mode').addEventListener('change', (e) => {
       this.storage.saveSettings({ simpleMode: e.target.checked });

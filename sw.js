@@ -1,5 +1,5 @@
 // عند كل نشر جديد: غيّر رقم VERSION ليتجدد الكاش (والـ shell يتحدّث تلقائيًا أيضًا بنمط stale-while-revalidate)
-const VERSION = 'v5';
+const VERSION = 'v6';
 const APP_SHELL_CACHE = `moshafi-shell-${VERSION}`;
 const RUNTIME_CACHE = `moshafi-runtime-${VERSION}`;
 const AUDIO_CACHE = 'moshafi-audio-v1'; // يديره التطبيق (التنزيلات) ولا يُحذف هنا

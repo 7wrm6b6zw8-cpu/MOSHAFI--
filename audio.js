@@ -95,6 +95,19 @@ export class AudioPlayerManager {
       this.setSleepTimer(parseInt(e.target.value, 10));
     });
 
+    // أزرار الاختيار (بدل القوائم المنسدلة): تضبط القيمة وتُشغّل نفس الحدث
+    document.querySelectorAll('.chip-group').forEach(group => {
+      group.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        const sel = document.getElementById(group.dataset.select);
+        sel.value = chip.dataset.value;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        this.syncOptionChips();
+      });
+    });
+    this.syncOptionChips();
+
     // المشغل: شريط مصغّر ↔ نافذة كاملة
     document.getElementById('player-mini-main').addEventListener('click', () => this.openSheet());
     document.getElementById('btn-player-collapse').addEventListener('click', () => this.closeSheet());
@@ -134,7 +147,7 @@ export class AudioPlayerManager {
     this.audio.addEventListener('ended', () => {
       if (this.stopAtSurahEnd) {
         this.setSleepTimer(0);
-        document.getElementById('player-sleep-timer').value = '0';
+        document.getElementById('player-sleep-timer').value = '0'; this.syncOptionChips?.();
         this.onNotify('انتهت السورة وتم الإيقاف حسب المؤقت.');
         return;
       }
@@ -173,9 +186,21 @@ export class AudioPlayerManager {
     document.getElementById('persistent-player').classList.toggle('is-playing', isPlaying);
   }
 
+  syncOptionChips() {
+    document.querySelectorAll('.chip-group').forEach(group => {
+      const val = document.getElementById(group.dataset.select)?.value;
+      group.querySelectorAll('.chip').forEach(c => {
+        const on = String(c.dataset.value) === String(val);
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-pressed', String(on));
+      });
+    });
+  }
+
   showPlayer() {
     document.getElementById('persistent-player').classList.add('has-track');
     document.body.classList.add('has-player');
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
   }
 
   openSheet() {
@@ -193,6 +218,7 @@ export class AudioPlayerManager {
     this.closeSheet();
     document.getElementById('persistent-player').classList.remove('has-track');
     document.body.classList.remove('has-player');
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
   }
 
   async loadAndPlaySurah(surahId, startAyah = 1, reciterId = null, startTime = null) {
@@ -551,7 +577,7 @@ export class AudioPlayerManager {
 
     this.sleepTimeout = setTimeout(() => {
       this.audio.pause();
-      document.getElementById('player-sleep-timer').value = '0';
+      document.getElementById('player-sleep-timer').value = '0'; this.syncOptionChips?.();
       badge.classList.add('hidden');
       this.onNotify('تم إيقاف التلاوة تلقائيًا حسب المؤقت المحدد.');
     }, minutes * 60 * 1000);
