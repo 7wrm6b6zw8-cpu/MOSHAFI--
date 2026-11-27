@@ -17,6 +17,7 @@ export class MushafManager {
     this.pageVerses = [];
     this.activePlayingVerseKey = null;
     this.loadSeq = 0;
+    this.loadFailed = false;
   }
 
   async init(chapters) {
@@ -26,6 +27,8 @@ export class MushafManager {
     this.currentPage = settings.lastReading?.page || 1;
     this.currentSurah = settings.lastReading?.surah || 1;
     this.bindEvents();
+    // لو فشل التحميل بسبب انقطاع الاتصال، نعيد المحاولة تلقائيًا عند رجوعه
+    window.addEventListener('online', () => { if (this.loadFailed) this.loadPage(this.currentPage); });
     this.updateModeButtons();
     return this.loadPage(this.currentPage, settings.lastReading?.ayah ? `${this.currentSurah}:${settings.lastReading.ayah}` : null);
   }
@@ -177,13 +180,12 @@ export class MushafManager {
     let verses;
     try {
       verses = await getPageVerses(this.storage, this.currentPage);
-    } catch {
-      if (seq === this.loadSeq) {
-        container.innerHTML = '<div class="notice-bar">هذه الصفحة غير محفوظة محليًا وأنت غير متصل بالإنترنت حاليًا. نزّل السورة من قسم التنزيلات لتصبح صفحاتها متاحة بدون إنترنت.</div>';
-      }
+    } catch (err) {
+      if (seq === this.loadSeq) this.showLoadError(err, highlightVerseKey);
       return;
     }
     if (seq !== this.loadSeq) return; // وصل طلب أحدث
+    this.loadFailed = false;
 
     this.pageVerses = verses;
     if (verses.length > 0) {
@@ -210,6 +212,39 @@ export class MushafManager {
     clearTimeout(this.readTimer);
     const viewed = this.currentPage;
     this.readTimer = setTimeout(() => this.onPageViewed && this.onPageViewed(viewed), 15000);
+  }
+
+  // رسالة خطأ صادقة: لا نقول «غير متصل» إلا لو المتصفح فعلًا غير متصل، ونعرض سبب الفشل وزر إعادة المحاولة
+  showLoadError(err, highlightVerseKey = null) {
+    this.loadFailed = true;
+    const container = document.getElementById('mushaf-content');
+    const offline = navigator.onLine === false;
+
+    const box = document.createElement('div');
+    box.className = 'notice-bar';
+    const msg = document.createElement('div');
+    msg.textContent = offline
+      ? 'هذه الصفحة غير محفوظة محليًا وأنت غير متصل بالإنترنت حاليًا. نزّل السورة من قسم التنزيلات لتصبح صفحاتها متاحة بدون إنترنت.'
+      : 'تعذّر تحميل الصفحة رغم وجود اتصال بالإنترنت. جرّب مرة أخرى، وإن استمرت المشكلة فقد يكون هناك VPN أو حاجب إعلانات أو شبكة تمنع الوصول لخادم المصحف.';
+    box.appendChild(msg);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-primary btn-sm';
+    btn.style.marginTop = '10px';
+    btn.innerHTML = '<span>إعادة المحاولة</span>';
+    btn.addEventListener('click', () => this.loadPage(this.currentPage, highlightVerseKey));
+    box.appendChild(btn);
+
+    if (!offline) {
+      const detail = document.createElement('div');
+      detail.className = 'notice-detail';
+      const code = err?.status ? `HTTP ${err.status}` : (err?.name === 'AbortError' ? 'انتهت مهلة الاتصال' : (err?.message || 'خطأ غير معروف'));
+      detail.textContent = `تفاصيل: ${code}`;
+      box.appendChild(detail);
+    }
+    container.innerHTML = '';
+    container.appendChild(box);
   }
 
   toArabicDigits(num) {

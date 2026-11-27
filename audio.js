@@ -50,7 +50,6 @@ export class AudioPlayerManager {
     this.audio.playbackRate = settings.playbackRate || 1;
 
     this.bindControls();
-    this.initSyncCalibration();
     this.setupMediaSession();
     this.updateHeaderDisplay();
   }
@@ -434,32 +433,6 @@ export class AudioPlayerManager {
     this.tick();
   }
 
-  // أزرار ضبط التزامن + خيار تتبّع التلاوة في المصحف
-  initSyncCalibration() {
-    const status = document.getElementById('word-sync-status');
-    if (!status || document.getElementById('sync-calibration')) return;
-    const box = document.createElement('div');
-    box.id = 'sync-calibration';
-    box.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;font-size:0.85rem;';
-    box.innerHTML = `
-      <span>ضبط التمييز:</span>
-      <button type="button" class="btn btn-outline btn-sm" data-step="-250" title="التمييز يتأخر عن الصوت: قدّمه">أبكر −</button>
-      <span id="sync-offset-label" aria-live="polite">بدون ضبط</span>
-      <button type="button" class="btn btn-outline btn-sm" data-step="250" title="التمييز يسبق الصوت: أخّره">+ أخّر</button>
-      <button type="button" class="btn btn-outline btn-sm" data-step="0">إعادة ضبط</button>
-      <label style="display:flex;gap:6px;align-items:center;margin-inline-start:auto;">
-        <input type="checkbox" id="chk-follow-playback" /> تتبّع التلاوة في المصحف
-      </label>`;
-    status.after(box);
-    box.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
-      const step = parseInt(b.dataset.step, 10);
-      this.setSyncOffset(step === 0 ? 0 : this.syncOffsetMs + step);
-    }));
-    const chk = document.getElementById('chk-follow-playback');
-    chk.checked = this.storage.getSettings().followPlayback !== false;
-    chk.addEventListener('change', () => this.storage.saveSettings({ followPlayback: chk.checked }));
-  }
-
   stepAyah(delta) {
     const parts = this.currentVerseKey.split(':');
     const surah = parseInt(parts[0], 10);
@@ -572,7 +545,7 @@ export class AudioPlayerManager {
 
     statusEl.textContent = this.wordSync.hasRealWordTimings
       ? `الآية ${verseKey} — مزامنة الكلمات نشطة (اضغط على أي كلمة لتشغيلها)`
-      : (this.wordSync.estimated ? `الآية ${verseKey} — تمييز تقريبي (اضبطه بالأزرار أدناه)` : `الآية ${verseKey} — تمييز الآية نشط`);
+      : (this.wordSync.estimated ? `الآية ${verseKey} — تمييز تقريبي` : `الآية ${verseKey} — تمييز الآية نشط`);
   }
 
   async updateLiveTafsir(verseKey) {

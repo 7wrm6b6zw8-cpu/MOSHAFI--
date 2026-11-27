@@ -492,7 +492,7 @@ class MoshafiApp {
     const m = this.mushaf;
     const container = document.getElementById('mushaf-content');
     const onPage = (k) => k && container.querySelector(`[data-verse-key="${k}"]`);
-    const follow = this.storage.getSettings().followPlayback !== false;
+    const follow = true; // تتبّع التلاوة دائمًا (أُزيل خيار الإيقاف من الواجهة)
     const mushafActive = document.getElementById('view-mushaf')?.classList.contains('active');
     const prev = m.activePlayingVerseKey;
 
