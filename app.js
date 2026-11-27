@@ -40,7 +40,7 @@ class MoshafiApp {
       this.storage,
       this.tafsirManager,
       this.wordSync,
-      (verseKey) => this.mushaf.highlightPlayingVerse(verseKey),
+      (verseKey) => this.followPlayingVerse(verseKey),
       (verseKey) => this.jumpToVerseInMushaf(verseKey),
       (msg) => this.showToast(msg)
     );
@@ -317,15 +317,22 @@ class MoshafiApp {
     if (packages.length === 0) {
       dlList.innerHTML = '<p class="empty-state">لا توجد سور منزّلة بعد.</p>';
     } else {
-      dlList.innerHTML = packages.map(pkg => `
-        <div class="download-item">
-          <div class="download-info">
-            <strong>سورة ${esc(pkg.surahName)}</strong>
-            <span class="subtitle">${(pkg.sizeBytes / (1024 * 1024)).toFixed(1)} MB · ${esc(pkg.reciterName)}</span>
+      // نفس شكل صفوف «كل السور»: دائرة الرقم + الاسم + أزرار على شكل حبة
+      const ico = (d) => `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+      const playIco = ico('<polygon points="7 4 19 12 7 20 7 4" fill="currentColor"/>');
+      const trashIco = ico('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>');
+      dlList.innerHTML = [...packages].sort((a, b) => a.surahId - b.surahId).map(pkg => `
+        <div class="surah-card dl-row">
+          <div class="surah-card-top">
+            <span class="surah-number">${pkg.surahId}</span>
+            <div class="dl-name-wrap">
+              <span class="surah-name-ar">سورة ${esc(pkg.surahName)}</span>
+              <span class="dl-sub">${(pkg.sizeBytes / (1024 * 1024)).toFixed(1)} MB · ${esc(pkg.reciterName)}</span>
+            </div>
           </div>
           <div class="surah-card-actions">
-            <button class="btn btn-primary btn-sm" data-play-offline="${pkg.surahId}" data-rec="${pkg.reciterId}" type="button"><span>تشغيل</span></button>
-            <button class="btn btn-danger btn-sm" data-del-pkg="${pkg.key}" type="button"><span>حذف</span></button>
+            <button class="dl-btn dl-play" data-play-offline="${pkg.surahId}" data-rec="${pkg.reciterId}" type="button" aria-label="تشغيل سورة ${esc(pkg.surahName)}">${playIco}<span>تشغيل</span></button>
+            <button class="dl-btn dl-del" data-del-pkg="${pkg.key}" type="button" aria-label="حذف سورة ${esc(pkg.surahName)}">${trashIco}<span>حذف</span></button>
           </div>
         </div>
       `).join('');
@@ -478,6 +485,30 @@ class MoshafiApp {
         });
       });
     }
+  }
+
+  // تمييز الآية المشغّلة في المصحف، وقلب الصفحة تلقائيًا عند الانتقال لآية في صفحة أخرى
+  async followPlayingVerse(verseKey) {
+    const m = this.mushaf;
+    const container = document.getElementById('mushaf-content');
+    const onPage = (k) => k && container.querySelector(`[data-verse-key="${k}"]`);
+    const follow = this.storage.getSettings().followPlayback !== false;
+    const mushafActive = document.getElementById('view-mushaf')?.classList.contains('active');
+    const prev = m.activePlayingVerseKey;
+
+    if (onPage(verseKey) || !follow || !mushafActive || this.followBusy || (prev && !onPage(prev))) {
+      // الآية في الصفحة الحالية، أو المستخدم تصفّح صفحة أخرى عمدًا فلا نسحبه
+      m.highlightPlayingVerse(verseKey);
+      return;
+    }
+    this.followBusy = true;
+    m.activePlayingVerseKey = verseKey; // ليُميَّز عند إعادة رسم الصفحة
+    try {
+      const page = await m.findVerseKeyPage(verseKey);
+      if (page && page !== m.currentPage) await m.loadPage(page, null);
+    } catch {}
+    this.followBusy = false;
+    m.highlightPlayingVerse(verseKey);
   }
 
   async jumpToVerseInMushaf(verseKey) {

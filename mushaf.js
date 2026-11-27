@@ -316,6 +316,8 @@ export class MushafManager {
     const target = container.querySelector(`[data-verse-key="${verseKey}"]`);
     if (target) {
       target.classList.add('active-ayah');
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
     }
   }
 

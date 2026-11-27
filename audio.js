@@ -38,6 +38,7 @@ export class AudioPlayerManager {
     this.repeatDone = 0;
     this.stopAtSurahEnd = false;
     this.loadingAudio = false;
+    this.syncOffsetMs = 0; // ضبط يدوي لتقدّم/تأخّر التمييز لكل قارئ
   }
 
   init(chapters) {
@@ -49,6 +50,7 @@ export class AudioPlayerManager {
     this.audio.playbackRate = settings.playbackRate || 1;
 
     this.bindControls();
+    this.initSyncCalibration();
     this.setupMediaSession();
     this.updateHeaderDisplay();
   }
@@ -275,6 +277,8 @@ export class AudioPlayerManager {
     }
 
     this.versesData = verses;
+    this.syncOffsetMs = (this.storage.getSettings().syncOffsets || {})[this.currentReciterId] || 0;
+    this.updateOffsetLabel();
     this.wordSync.loadChapterData(verses, audioFileMeta);
     document.getElementById('player-offline-indicator').classList.toggle('hidden', !isOfflinePlayback);
 
@@ -305,28 +309,37 @@ export class AudioPlayerManager {
     }
     if (token !== this.loadToken) return;
 
-    // لا توجد توقيتات من المصدر → توزيع تقريبي حتى يعمل تمييز الآية والتكرار
+    // نتحقق أن التوقيتات تخص هذا الملف فعلًا (وحدة الزمن + مطابقة الطول) قبل الاعتماد عليها
+    const durMs = Number.isFinite(this.audio.duration) ? this.audio.duration * 1000 : 0;
+    if (this.wordSync.verseTimings.size) this.wordSync.normalizeUnits(durMs);
     let syncMode = this.wordSync.hasRealWordTimings ? 'words' : (this.wordSync.verseTimings.size ? 'verses' : 'none');
-    if (syncMode === 'none' && Number.isFinite(this.audio.duration)) {
-      if (this.wordSync.buildEstimatedTimings(this.audio.duration * 1000)) syncMode = 'estimated';
+    if (this.wordSync.verseTimings.size && durMs && !this.wordSync.isReliable(durMs)) {
+      if (this.wordSync.buildEstimatedTimings(durMs)) syncMode = 'mismatch';
+    } else if (syncMode === 'none' && durMs) {
+      if (this.wordSync.buildEstimatedTimings(durMs)) syncMode = 'estimated';
     }
-    document.getElementById('sync-availability-notice').textContent = {
+    this.syncMode = syncMode;
+    const notice = document.getElementById('sync-availability-notice');
+    notice.textContent = {
       words: 'تتوفر توقيتات كلمات دقيقة لهذا القارئ والتسجيل.',
       verses: 'يتوفر توقيت كل آية لهذا التسجيل دون توقيت الكلمات؛ يُميَّز مقطع الآية الحالية.',
-      estimated: 'هذا التسجيل لا يوفر توقيتات؛ تمييز الآية والتكرار تقريبيان (موزّعان حسب طول الآيات) وقد ينحرفان قليلًا.',
+      estimated: 'هذا التسجيل لا يوفر توقيتات؛ تمييز الآية تقريبي (موزّع حسب طول الآيات). يمكنك تحسينه بأزرار «ضبط التمييز».',
+      mismatch: 'توقيتات المصدر لا تطابق طول هذا التسجيل، فاستُخدم تمييز تقريبي. جرّب قارئًا آخر أو اضبط التمييز يدويًا.',
       none: 'لا تتوفر توقيتات لهذا التسجيل، لذلك لن يتم تمييز الآيات تلقائيًا.'
     }[syncMode];
+    notice.classList.toggle('hidden', syncMode === 'words' || syncMode === 'verses');
 
     if (startTime !== null && Number.isFinite(startTime) && startTime > 0) {
       this.audio.currentTime = startTime;
     } else {
       const targetStartMs = this.wordSync.getVerseStartMs(`${surahId}:${startAyah}`);
-      if (targetStartMs !== null && startAyah > 1) this.audio.currentTime = targetStartMs / 1000;
+      if (targetStartMs !== null && startAyah > 1) this.seekToMs(targetStartMs);
     }
 
     this.renderVerseForSync(`${surahId}:${startAyah}`, null);
     this.updateLiveTafsir(`${surahId}:${startAyah}`);
     this.updateMediaMetadata();
+    if (this.onVerseChange) this.onVerseChange(`${surahId}:${startAyah}`);
 
     try {
       await this.audio.play();
@@ -395,6 +408,58 @@ export class AudioPlayerManager {
     }
   }
 
+  // كل انتقال لبداية آية يمر من هنا حتى تُطبَّق الإزاحة بشكل موحّد
+  seekToMs(ms) {
+    this.audio.currentTime = Math.max(0, (ms + this.syncOffsetMs) / 1000);
+  }
+
+  mediaMs() {
+    return this.audio.currentTime * 1000 - this.syncOffsetMs;
+  }
+
+  updateOffsetLabel() {
+    const el = document.getElementById('sync-offset-label');
+    if (!el) return;
+    const s = this.syncOffsetMs / 1000;
+    el.textContent = s === 0 ? 'بدون ضبط' : `${s > 0 ? '+' : ''}${s.toFixed(2)} ث`;
+  }
+
+  setSyncOffset(ms) {
+    this.syncOffsetMs = Math.max(-5000, Math.min(5000, ms));
+    const all = { ...(this.storage.getSettings().syncOffsets || {}) };
+    if (this.syncOffsetMs) all[this.currentReciterId] = this.syncOffsetMs; else delete all[this.currentReciterId];
+    this.storage.saveSettings({ syncOffsets: all });
+    this.updateOffsetLabel();
+    this._lastRenderKey = null;
+    this.tick();
+  }
+
+  // أزرار ضبط التزامن + خيار تتبّع التلاوة في المصحف
+  initSyncCalibration() {
+    const status = document.getElementById('word-sync-status');
+    if (!status || document.getElementById('sync-calibration')) return;
+    const box = document.createElement('div');
+    box.id = 'sync-calibration';
+    box.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;font-size:0.85rem;';
+    box.innerHTML = `
+      <span>ضبط التمييز:</span>
+      <button type="button" class="btn btn-outline btn-sm" data-step="-250" title="التمييز يتأخر عن الصوت: قدّمه">أبكر −</button>
+      <span id="sync-offset-label" aria-live="polite">بدون ضبط</span>
+      <button type="button" class="btn btn-outline btn-sm" data-step="250" title="التمييز يسبق الصوت: أخّره">+ أخّر</button>
+      <button type="button" class="btn btn-outline btn-sm" data-step="0">إعادة ضبط</button>
+      <label style="display:flex;gap:6px;align-items:center;margin-inline-start:auto;">
+        <input type="checkbox" id="chk-follow-playback" /> تتبّع التلاوة في المصحف
+      </label>`;
+    status.after(box);
+    box.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+      const step = parseInt(b.dataset.step, 10);
+      this.setSyncOffset(step === 0 ? 0 : this.syncOffsetMs + step);
+    }));
+    const chk = document.getElementById('chk-follow-playback');
+    chk.checked = this.storage.getSettings().followPlayback !== false;
+    chk.addEventListener('change', () => this.storage.saveSettings({ followPlayback: chk.checked }));
+  }
+
   stepAyah(delta) {
     const parts = this.currentVerseKey.split(':');
     const surah = parseInt(parts[0], 10);
@@ -404,7 +469,7 @@ export class AudioPlayerManager {
     const targetKey = `${surah}:${targetAyah}`;
     const startMs = this.wordSync.getVerseStartMs(targetKey);
     if (startMs !== null) {
-      this.audio.currentTime = startMs / 1000;
+      this.seekToMs(startMs);
       this.currentVerseKey = targetKey;
       this.updateHeaderDisplay();
       this.renderVerseForSync(targetKey, null);
@@ -426,7 +491,7 @@ export class AudioPlayerManager {
   }
 
   tick() {
-    const currentMs = this.audio.currentTime * 1000;
+    const currentMs = this.mediaMs();
     const state = this.wordSync.getActiveStateAtMs(currentMs);
     if (!state) return;
 
@@ -438,7 +503,7 @@ export class AudioPlayerManager {
       if (repeatMode === 'ayah' && currentMs >= state.verseEndMs - 250) {
         if (canRepeat) {
           this.repeatDone++;
-          this.audio.currentTime = state.verseStartMs / 1000;
+          this.seekToMs(state.verseStartMs);
           return;
         }
       } else if (repeatMode === 'range') {
@@ -447,7 +512,7 @@ export class AudioPlayerManager {
         const currentAyahNum = parseInt(state.verseKey.split(':')[1], 10);
         if (canRepeat && (currentAyahNum > toAyah || (currentAyahNum === toAyah && currentMs >= state.verseEndMs - 250))) {
           const startRangeMs = this.wordSync.getVerseStartMs(`${this.currentSurah}:${fromAyah}`);
-          if (startRangeMs !== null) { this.repeatDone++; this.audio.currentTime = startRangeMs / 1000; return; }
+          if (startRangeMs !== null) { this.repeatDone++; this.seekToMs(startRangeMs); return; }
         }
       }
     }
@@ -493,7 +558,7 @@ export class AudioPlayerManager {
           const pos = parseInt(el.dataset.pos, 10);
           const wStartMs = this.wordSync.getWordStartMs(verseKey, pos);
           if (wStartMs !== null) {
-            this.audio.currentTime = wStartMs / 1000;
+            this.seekToMs(wStartMs);
             if (this.audio.paused) this.audio.play();
           }
         });
@@ -507,7 +572,7 @@ export class AudioPlayerManager {
 
     statusEl.textContent = this.wordSync.hasRealWordTimings
       ? `الآية ${verseKey} — مزامنة الكلمات نشطة (اضغط على أي كلمة لتشغيلها)`
-      : (this.wordSync.estimated ? `الآية ${verseKey} — تمييز تقريبي للآية` : `الآية ${verseKey} — تمييز الآية نشط`);
+      : (this.wordSync.estimated ? `الآية ${verseKey} — تمييز تقريبي (اضبطه بالأزرار أدناه)` : `الآية ${verseKey} — تمييز الآية نشط`);
   }
 
   async updateLiveTafsir(verseKey) {

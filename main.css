@@ -667,3 +667,23 @@ body.reading #view-mushaf.active { display: block; }
   .surah-card-top .badge { display: none; }
   .surah-card .btn-sm { padding: 6px 11px; font-size: 0.82rem; }
 }
+
+/* السور المنزّلة: نفس شكل صفوف «كل السور» */
+.dl-row .surah-card-top { align-items: center; }
+.dl-name-wrap { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.35; }
+.dl-name-wrap .surah-name-ar { flex: none; }
+.dl-sub { font-size: 0.75rem; color: var(--text-muted); }
+.dl-row .surah-card-actions { gap: 6px; }
+.dl-row .dl-btn { padding: 6px 12px; font-size: 0.82rem; }
+.dl-play { background: var(--green-dark); border-color: var(--green-dark); color: #FAF8F3; }
+.dl-del { border-color: var(--danger-color); color: var(--danger-color); }
+[data-theme="dark"] .dl-play { background: var(--green-soft); border-color: transparent; color: var(--accent-text); }
+[data-theme="dark"] .dl-del { color: #F0A3A3; border-color: #8B4A4A; }
+/* على الموبايل: نص فقط حتى لا يُقصّ اسم السورة؛ الأيقونات تظهر على الشاشات الأوسع */
+.dl-row .dl-btn svg { display: none; }
+.dl-row .dl-btn { padding: 6px 12px; }
+@media (min-width: 460px) { .dl-row .dl-btn svg { display: inline; } }
+
+/* مسافات بطاقة «تنزيل مجموعة سور» */
+.card:has(#batch-group-select) .surah-card-actions { margin: 12px 0 8px; flex-wrap: wrap; }
+.card:has(#batch-group-select) .subtitle { line-height: 1.6; }
